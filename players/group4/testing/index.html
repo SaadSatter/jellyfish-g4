@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Group 4 · Jellyfish testing</title>
+  <link rel="stylesheet" href="/dashboard.css">
+  <script type="module" src="/dashboard.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <span class="wordmark">Jellyfish testing <span>Group 4</span></span>
+    <nav aria-label="Results"><a href="#comparison">Compare</a><a href="#runs">All runs</a></nav>
+  </header>
+  <div class="shell">
+    <aside class="controls">
+      <h2>New batch</h2>
+      <form id="batch-form">
+        <label>Preset<select id="preset"><option value="class">Class replay</option><option value="replacement">Replacement</option></select></label>
+        <label>Batch name<input name="label" value="Class replay" maxlength="120"></label>
+        <label>Player versions<textarea name="versions" rows="2" required>313562f, worktree</textarea></label>
+        <p class="hint">Use a Git ref, <code>worktree</code>, or a selector such as <code>group:3</code></p>
+        <label>Seeds<textarea name="seeds" rows="2" required>95527, 94339, 75384</textarea></label>
+        <p class="hint">Use commas to try several seeds, memory sizes, lifespans, or run lengths</p>
+        <div class="fields">
+          <label>Memory (bytes)<input name="memories" value="1024" required></label>
+          <label>Lifespan (years)<input name="lifetimes" value="205" required></label>
+          <label>Run length (days)<input name="days" value="1800" required></label>
+          <label>Starting population<input name="initial" type="number" min="1" value="100" required></label>
+          <label>Population cap<input name="cap" type="number" min="1" value="2000" required></label>
+          <label>Workers<input name="workers" type="number" min="1" max="16" value="3" required></label>
+        </div>
+        <label>Map<select name="map_path" id="map"><option value="">Random by seed</option></select></label>
+        <label>Timeout per run (seconds)<input name="timeout" type="number" min="0.1" step="any" value="120" required></label>
+        <button class="primary" id="start" type="submit">Run batch</button>
+        <p class="form-status" id="form-status" role="status"></p>
+      </form>
+    </aside>
+    <main>
+      <section class="overview" aria-labelledby="page-title">
+        <div><h1 id="page-title">Run comparisons</h1><p id="batch-meta">Choose a saved batch or run a new one.</p></div>
+        <label>Saved batch<select id="batches"><option value="">No saved batches</option></select></label>
+      </section>
+      <div id="metrics" class="metrics" aria-label="Batch summary">
+        <div><span>Results recorded</span><strong id="recorded">—</strong><small id="batch-status" role="status">Awaiting a batch</small></div>
+        <div><span>Matched seeds</span><strong id="matched">—</strong><small id="tradeoffs">Candidate wins / ties / losses</small></div>
+        <div><span>Replacement rate</span><strong id="replacement">—</strong><small id="replacement-note">At least the starting population after founder lifespan</small></div>
+      </div>
+      <section id="comparison" class="panel comparison" aria-labelledby="comparison-title">
+        <div class="panel-heading"><div><h2 id="comparison-title">Population by day</h2><p id="chart-caption">Select a matched seed to compare its population histories.</p></div></div>
+        <div class="compare-filters">
+          <label>Baseline<select id="baseline" disabled></select></label>
+          <label>Candidate<select id="candidate" disabled></select></label>
+          <label>Settings<select id="scope" disabled></select></label>
+          <label>Seed<select id="compare-seed" disabled></select></label>
+        </div>
+        <div class="comparison-body">
+          <div class="chart-wrap"><div id="population-chart"></div><div id="legend" class="legend"></div></div>
+          <div class="paired"><h3>Final population change</h3><p>Candidate minus baseline</p><div id="deltas" class="delta-list"></div></div>
+        </div>
+      </section>
+      <section class="panel memory-panel" aria-labelledby="memory-title">
+        <div class="panel-heading">
+          <div><h2 id="memory-title">Performance by memory</h2><p>Completed pairs with the same seeds, lifespan, and run length</p></div>
+          <label>Metric<select id="memory-metric">
+            <option value="replacement">Replacement rate</option><option value="extinct">Extinction rate</option><option value="growth">10J reach rate</option>
+          </select></label>
+        </div>
+        <div id="memory-chart" class="memory-chart"></div>
+      </section>
+      <section class="panel runs-panel" id="runs" aria-labelledby="runs-title">
+        <div class="panel-heading">
+          <div><h2 id="runs-title">All runs</h2><p id="run-count">0 runs</p></div>
+          <div class="exports"><button id="csv" disabled>Export CSV</button><a id="export-json" hidden>Full results JSON</a></div>
+        </div>
+        <div class="run-filters">
+          <label>Version<select id="filter-version"></select></label>
+          <label>Seed<select id="filter-seed"></select></label>
+          <label>Memory<select id="filter-memory"></select></label>
+          <label>Lifespan<select id="filter-life"></select></label>
+          <label>Days<select id="filter-days"></select></label>
+          <label>Status<select id="filter-status"></select></label>
+        </div>
+        <div class="table-scroll"><table>
+          <thead><tr><th scope="col">Version</th><th scope="col">Seed</th><th scope="col">Bytes</th><th scope="col">Years</th><th scope="col">Days</th><th scope="col">Final</th><th scope="col">Births</th><th scope="col">Predator deaths</th><th scope="col">Status</th></tr></thead>
+          <tbody id="run-rows"></tbody>
+        </table></div>
+        <div id="run-detail" class="run-detail" hidden></div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
